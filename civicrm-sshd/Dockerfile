@@ -3,17 +3,21 @@ MAINTAINER Adam Dobrawy "http://github.com/ad-m/"
 # Setup SSHD server
 RUN apt-get update \
 && apt-get install -y --no-install-recommends openssh-server curl rsync wget git less \
+&& apt-get install -y nano \
 && rm -rf /var/lib/apt/lists/* \
 RUN mkdir /run/sshd && \
 mkdir /var/run/sshd && \
 mkdir /root/.ssh
 USER root
 EXPOSE 22
+# Set Warsaw timezone
+RUN unlink /etc/localtime
+RUN ln -s /usr/share/zoneinfo/Poland /etc/localtime
+
 # Add github ssh-keys importer
 ENV ACCESS_USER="root,www-data"
 COPY ./entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
-
 # Add wp-cli
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
 && php wp-cli.phar --info \
